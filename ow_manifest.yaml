@@ -1,0 +1,50 @@
+packages:
+    jobsuche-dev:
+        version: 0.1
+        actions:
+            handle-request:
+                function: main.js
+                runtime: nodejs@12
+                main: handle_request
+                web: raw
+            get-auth:
+                function: src/get-auth.js
+                runtime: nodejs@12
+                main: get_auth
+                description: Gets the JWT token from S3
+                inputs:
+                    bucket:
+                        type: string
+                        default: auth
+                    name:
+                        type: string
+                        default: jobsuche_token.json
+            request-token:
+                function: src/request-token.js
+                runtime: nodejs@12
+                main: request_token
+                description: Requests a new JWT from API
+            refresh-token:
+                function: src/refresh-token.js
+                runtime: nodejs@12
+                main: refresh_token
+                description: Replaces the old JWT in S3 with new
+                inputs:
+                    bucket:
+                        type: string
+                        default: auth
+                    name:
+                        type: string
+                        default: jobsuche_token.json
+            send-request:
+                function: src/send-request.js
+                runtime: nodejs@12
+                main: send_request
+                description: Forwards the requst to API and returns result
+        apis:
+            jobsuche-dev-api:
+                jobsuche:
+                    api:
+                        handle-request:
+                            method: GET
+                            response: json
