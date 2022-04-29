@@ -28,7 +28,7 @@ async function refresh_token(params) {
 		body: JSON.stringify(params.token),
 	})
 
-	return params
+	return { token: params.token }
 }
 
 async function delete_obj(params) {

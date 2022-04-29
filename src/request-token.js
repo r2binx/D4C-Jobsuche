@@ -14,5 +14,5 @@ async function request_token(params) {
 	})
 
 	let data = await result.json()
-	return { jwt: data.access_token, expires: Date.now() + data.expires_in * 1000 }
+	return { token: { jwt: data.access_token, expires: Date.now() + data.expires_in * 1000 } }
 }

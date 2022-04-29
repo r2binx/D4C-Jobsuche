@@ -4,12 +4,12 @@ packages:
         actions:
             handle-request:
                 function: main.js
-                runtime: nodejs@12
+                runtime: nodejs@16
                 main: handle_request
                 web: raw
             get-auth:
                 function: src/get-auth.js
-                runtime: nodejs@12
+                runtime: nodejs@16
                 main: get_auth
                 description: Gets the JWT token from S3
                 inputs:
@@ -21,12 +21,12 @@ packages:
                         default: jobsuche_token.json
             request-token:
                 function: src/request-token.js
-                runtime: nodejs@12
+                runtime: nodejs@16
                 main: request_token
                 description: Requests a new JWT from API
             refresh-token:
                 function: src/refresh-token.js
-                runtime: nodejs@12
+                runtime: nodejs@16
                 main: refresh_token
                 description: Replaces the old JWT in S3 with new
                 inputs:
@@ -38,9 +38,21 @@ packages:
                         default: jobsuche_token.json
             send-request:
                 function: src/send-request.js
-                runtime: nodejs@12
+                runtime: nodejs@16
                 main: send_request
                 description: Forwards the requst to API and returns result
+        sequences:
+            request-refresh-jwt:
+                actions: request-token, refresh-token
+        triggers:
+            refresh-token-hourly:
+                feed: /whisk.system/alarms/interval
+                inputs:
+                    minutes: 55
+        rules:
+            hourly-token-rule:
+                trigger: refresh-token-hourly
+                action: request-refresh-jwt
         apis:
             jobsuche-dev-api:
                 jobsuche:
