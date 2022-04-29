@@ -18,13 +18,13 @@ function cos_client(params) {
 
 	return new COS.S3(config)
 }
+
 async function get_auth(params) {
 	if (!params.bucket) throw new Error("Missing bucket parameter.")
 	if (!params.name) params.name = "jobsuche_token.json"
 
 	let client = cos_client(params)
 	let response = await client.getObject({ Bucket: params.bucket, Key: params.name }).promise()
-	let token = JSON.parse(Buffer.from(response.Body))
 
-	return token
+	return { token: JSON.parse(Buffer.from(response.Body)) }
 }

@@ -9,5 +9,5 @@ async function send_request(params) {
 			Pragma: "no-cache",
 		},
 	})
-	return await result.json()
+	return result.json()
 }
