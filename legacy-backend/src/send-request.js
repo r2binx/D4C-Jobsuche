@@ -1,4 +1,4 @@
-const fetch = require("node-fetch")
+const fetch = require("node-fetch");
 
 async function send_request(params) {
 	let result = await fetch(params.request_url, {
@@ -8,6 +8,6 @@ async function send_request(params) {
 			OAuthAccessToken: params.token.jwt,
 			Pragma: "no-cache",
 		},
-	})
-	return result.json()
+	});
+	return result.json();
 }

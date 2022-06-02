@@ -41,6 +41,14 @@ packages:
                 runtime: nodejs@16
                 main: send_request
                 description: Forwards the requst to API and returns result
+            event-consumer:
+                function: src/consumer.js
+                runtime: nodejs@16
+                main: consume
+            event-producer:
+                function: src/producer.js
+                runtime: nodejs@16
+                main: produce
         sequences:
             request-refresh-jwt:
                 actions: request-token, refresh-token
