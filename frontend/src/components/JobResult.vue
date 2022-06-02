@@ -39,7 +39,7 @@ const router = useRouter();
 				@click="
 					router.push({
 						name: 'details-id',
-						params: { id: job.hashId },
+						params: { id: job.refnr },
 					})
 				"
 				>Details</n-button
