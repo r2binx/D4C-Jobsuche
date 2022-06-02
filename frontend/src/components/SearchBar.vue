@@ -2,6 +2,8 @@
 import JobResult from "./JobResult.vue";
 
 const { data, error, loading, getData, abort } = useApi();
+const jobsStore = inject("jobsStore");
+
 const searchQuery = $ref({
 	search: "",
 	place: "",
@@ -31,13 +33,54 @@ const typeOptions = [
 
 const formRef = ref();
 
+function buildQuery(query) {
+	let parameters = {
+		angebotsart: query.type,
+		umkreis: query.radius,
+		page: query.page,
+		size: 25,
+	};
+
+	// add parameters only if value defined
+	parameters = {
+		...parameters,
+		...(query.place && { wo: query.place }),
+		...(query.search && { was: query.search }),
+	};
+
+	return "/jobs?" + new URLSearchParams(parameters);
+}
+
 function makeRequest() {
 	formRef.value.validate((errors) => {
 		if (errors) return console.error(errors);
 
-		getData(searchQuery);
+		// make request
+		getData(buildQuery(searchQuery));
+
+		// update store when data changes
+		watch(data, (newData) => {
+			let totalResults = newData?.result.maxErgebnisse;
+
+			searchQuery = {
+				...searchQuery,
+				...(totalResults && { totalPages: Math.ceil(totalResults / 25) }),
+			};
+
+			// add result to store
+			jobsStore.addResults(newData?.result.stellenangebote, searchQuery.page);
+		});
 	});
 }
+
+// watch for page changes
+watch(
+	() => searchQuery.page,
+	(newPage) => {
+		console.log(`Page changed to ${newPage}`);
+		if (!jobsStore.getPage(newPage)) makeRequest();
+	}
+);
 </script>
 <template>
 	<n-form ref="formRef" :model="searchQuery" style="margin-bottom: 1rem">
@@ -77,14 +120,25 @@ function makeRequest() {
 			<n-button v-if="loading" type="warning" @click="abort()">Abbrechen</n-button>
 		</n-space>
 	</n-form>
-
 	<n-spin v-if="loading" size="large" />
 	<template v-else>
 		<div v-if="!error">
+			<n-pagination
+				v-if="searchQuery.totalPages"
+				:page-count="searchQuery.totalPages"
+				v-model:page="searchQuery.page"
+				style="margin: 2rem 0; justify-content: center"
+			/>
 			<JobResult
-				v-for="result in data?.result.stellenangebote"
+				v-for="result in jobsStore.getPage(searchQuery.page)"
 				:key="result.hashId"
 				:job="result"
+			/>
+			<n-pagination
+				v-if="searchQuery.totalPages"
+				:page-count="searchQuery.totalPages"
+				v-model:page="searchQuery.page"
+				style="margin: 2rem 0; justify-content: center"
 			/>
 		</div>
 		<pre v-else>{{ error }}</pre>
