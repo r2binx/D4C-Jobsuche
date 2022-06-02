@@ -1,4 +1,4 @@
-export class Jobs {
+export class JobsStore {
 	constructor() {
 		this.results = [];
 

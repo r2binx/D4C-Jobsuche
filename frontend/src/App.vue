@@ -4,7 +4,6 @@
 </script>
 
 <template>
-	<!--	<img alt="Vue logo" src="./assets/logo.png" />-->
 	<h1>Jobsuche</h1>
 	<router-view />
 </template>

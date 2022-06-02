@@ -10,18 +10,17 @@
 		"format": "prettier .  --write"
 	},
 	"dependencies": {
-		"@vueuse/core": "^8.5.0",
-		"vue": "^3.2.25",
-		"vue-router": "^4.0.15"
+		"vue": "3.2.36",
+		"vue-router": "4.0.15"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^2.3.3",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-vue": "^9.0.1",
-		"naive-ui": "^2.29.0",
+		"eslint-plugin-vue": "^9.1.0",
+		"naive-ui": "^2.29.1",
 		"prettier": "^2.6.2",
-		"unplugin-auto-import": "^0.8.5",
+		"unplugin-auto-import": "^0.8.6",
 		"unplugin-vue-components": "^0.19.6",
 		"vite": "^2.9.9",
 		"vite-plugin-inspect": "^0.5.0",

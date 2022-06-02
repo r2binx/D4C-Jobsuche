@@ -13,7 +13,7 @@ export default defineConfig({
 		vue({ reactivityTransform: true }),
 		Inspect(),
 		AutoImport({
-			imports: ["vue", "vue-router", "vue/macros", "@vueuse/core"],
+			imports: ["vue", "vue-router", "vue/macros"],
 			dirs: ["src/composables"],
 			dts: true,
 			resolvers: [NaiveUiResolver()],

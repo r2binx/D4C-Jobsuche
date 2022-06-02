@@ -88,15 +88,15 @@ watch(
 			<n-form-item label="Was?" path="search">
 				<n-input
 					v-model:value="searchQuery.search"
-					@keyup.enter="makeRequest"
 					placeholder="Suche"
+					@keyup.enter="makeRequest"
 				/>
 			</n-form-item>
 			<n-form-item label="Wo?" path="place">
 				<n-input
 					v-model:value="searchQuery.place"
-					@keyup.enter="makeRequest"
 					placeholder="Ort"
+					@keyup.enter="makeRequest"
 				/>
 			</n-form-item>
 			<n-form-item label="Art?" path="type">
@@ -125,8 +125,8 @@ watch(
 		<div v-if="!error">
 			<n-pagination
 				v-if="searchQuery.totalPages"
-				:page-count="searchQuery.totalPages"
 				v-model:page="searchQuery.page"
+				:page-count="searchQuery.totalPages"
 				style="margin: 2rem 0; justify-content: center"
 			/>
 			<JobResult
@@ -136,8 +136,8 @@ watch(
 			/>
 			<n-pagination
 				v-if="searchQuery.totalPages"
-				:page-count="searchQuery.totalPages"
 				v-model:page="searchQuery.page"
+				:page-count="searchQuery.totalPages"
 				style="margin: 2rem 0; justify-content: center"
 			/>
 		</div>
