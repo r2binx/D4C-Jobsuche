@@ -1,7 +1,11 @@
 <script setup>
-const route = useRoute();
-const job = JSON.parse(route.params.job);
+const props = defineProps({
+	id: {
+		type: String,
+		required: true,
+	},
+});
 </script>
 <template>
-	<JobDetails :job="job" />
+	<JobDetails :id="props.id" />
 </template>

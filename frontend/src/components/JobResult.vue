@@ -7,32 +7,6 @@ defineProps({
 });
 
 const router = useRouter();
-
-/**
-  {
-  "aktuelleVeroeffentlichungsdatum": "2022-06-02",
-  "arbeitgeber": "Süd Personalmanagement GmbH",
-  "arbeitsort": {
-    "entfernung": "1",
-    "koordinaten": {
-      "lat": 48.7730095,
-      "lon": 9.172655
-    },
-    "land": "Deutschland",
-    "ort": "Stuttgart",
-    "plz": "70178",
-    "region": "Baden-Württemberg",
-    "strasse": "Marienstr. 24"
-  },
-  "beruf": "Personaldienstleistungskaufmann/-frau",
-  "eintrittsdatum": "2022-06-02",
-  "hashId": "XsLTByCsW_gtjnxWbmoXbzD2LIX4jHn2dKpWNg2Wgog=",
-  "logoHashId": "f743eh2yh1b4hKV8FVkzg7yFdCckqHaTPRP2bUlrz7U=",
-  "modifikationsTimestamp": "2022-06-02T07:18:33.574",
-  "refnr": "10000-1189502969-S",
-  "titel": "Personaldisponent/in"
-}
- */
 </script>
 <template>
 	<n-card
@@ -54,9 +28,9 @@ const router = useRouter();
 			{{ new Date(job.aktuelleVeroeffentlichungsdatum).toLocaleDateString() }}
 		</template>
 		<ul style="float: left; text-align: left">
-			<li>Beruf: {{ job.titel }}</li>
-			<li>Ab: {{ new Date(job.eintrittsdatum).toLocaleDateString() }}</li>
-			<li>In: {{ job.arbeitsort.ort }}</li>
+			<li>Stelle: {{ job.titel }}</li>
+			<li>Ab {{ new Date(job.eintrittsdatum).toLocaleDateString() }}</li>
+			<li>In {{ job.arbeitsort.ort }}</li>
 		</ul>
 		<template #action>
 			<n-button
@@ -65,7 +39,7 @@ const router = useRouter();
 				@click="
 					router.push({
 						name: 'details-id',
-						params: { id: job.hashId, job: JSON.stringify(job) },
+						params: { id: job.hashId },
 					})
 				"
 				>Details</n-button

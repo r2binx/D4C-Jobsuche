@@ -7,27 +7,11 @@ export function useApi() {
 	const abort = () => controller.abort();
 
 	const getData = async (query) => {
+		data = null;
+		error = null;
 		loading = true;
 
-		let parameters = {
-			angebotsart: query.type,
-			umkreis: query.radius,
-			page: query.page,
-			size: 50,
-		};
-
-		// add parameters only if value defined
-		parameters = {
-			...parameters,
-			...(query.place && { wo: query.place }),
-			...(query.search && { was: query.search }),
-		};
-		console.log(parameters);
-
-		let url =
-			import.meta.env.VITE_API_ENDPOINT +
-			"/jobs?" +
-			new URLSearchParams(parameters);
+		let url = import.meta.env.VITE_API_ENDPOINT + query;
 
 		fetch(url, { signal: controller.signal })
 			.then((res) => res.json())
