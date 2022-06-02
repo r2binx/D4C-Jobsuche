@@ -9,8 +9,27 @@ const invoke = (actionName, params, result = true) =>
 	});
 
 async function handle_request(params) {
-	let base_url = "https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4";
-	params.request_url = base_url + params.__ow_path + "?" + params.__ow_query;
+	const baseUrl = "https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc";
+
+	params.request_url = baseUrl;
+
+	let requestPath = params.__ow_path.split("/");
+
+	switch (requestPath[1]) {
+		case "jobs":
+			params.request_url += "/v4/app/jobs?" + params.__ow_query;
+			break;
+		case "details":
+			if (requestPath[2]) {
+				params.request_url += "/v2/jobdetails/" + requestPath[2];
+			} else {
+				console.log("No id in path");
+			}
+			break;
+		default:
+			console.log("Unknown path, not allowed: " + params.__ow_path);
+			return;
+	}
 
 	return invoke("jobsuche-db/read-document", { id: params.request_url })
 		.then(async (doc) => {
