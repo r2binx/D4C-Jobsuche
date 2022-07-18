@@ -1,0 +1,109 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "_terraform/**"
+      - "_aws-code/**"
+
+env:
+  CODE_DIR: _aws-code
+  TERRAFORM_DIR: _terraform
+
+jobs:
+  detectChanges:
+    runs-on: ubuntu-latest
+    outputs:
+      changedDirs: ${{ steps.set-matrix.outputs.matrix }}
+    name: Apply given Terraform changes, Check for AWS-Code Changes
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Check Terraform Modification
+        id: changed-terraform
+        uses: tj-actions/changed-files@v23.1
+        with:
+          diff_relative: true
+          path: ${{ env.TERRAFORM_DIR }}
+      - name: Configure AWS Credentials
+        if: ${{ steps.changed-terraform.outputs.all_changed_files != '' }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Load Terraform Action
+        if: ${{ steps.changed-terraform.outputs.all_changed_files != '' }}
+        uses: hashicorp/setup-terraform@v1
+      - name: Apply Modified Terraform Infrastructure
+        if: ${{ steps.changed-terraform.outputs.all_changed_files != '' }}
+        run: |
+          cd ${{ env.TERRAFORM_DIR }}
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Find changed AWS-Code files
+        id: changed-files
+        uses: tj-actions/changed-files@v23.1
+        with:
+          diff_relative: true
+          dir_names: true
+          path: ${{ env.CODE_DIR }}
+      - id: set-matrix
+        run: |
+          count=0
+          JSON_OUT=""
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            TYPE=""
+            NAME=""
+
+            while IFS='#' read -ra ADDR; do
+              TYPE="${ADDR[0]}"
+              NAME="${ADDR[1]}"
+            done <<< "$file"
+
+            while IFS='/' read -ra ADDR; do
+              NAME="${ADDR[0]}"
+            done <<< "$NAME"
+
+            if ! [[ "$JSON_OUT" == *"$NAME"* ]]; then
+              if [ $count -gt 0 ]; then
+                JSON_OUT+=", "
+              fi
+              JSON_OUT+="{\"type\": \"$TYPE\",\"name\": \"$NAME\"}"
+              ((count+=1))
+            fi
+          done
+
+          echo "::set-output name=matrix::[$JSON_OUT]"
+
+  deployCodeToAws:
+    needs: [detectChanges]
+    runs-on: ubuntu-latest
+    if: ${{fromJSON(needs.detectChanges.outputs.changedDirs)[0] != null}}
+    strategy:
+      matrix:
+        include: ${{fromJSON(needs.detectChanges.outputs.changedDirs)}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy To S3
+        if: ${{ matrix.type == 'aws_s3_bucket' }}
+        run: |
+          aws s3 sync ${{ env.CODE_DIR }}/aws_s3_bucket#${{ matrix.name }} s3://${{ matrix.name }}
+      - name: Deploy To Lambda
+        if: ${{ matrix.type == 'aws_lambda' }}
+        run: |
+          cd ${{ env.CODE_DIR }}/aws_lambda#${{ matrix.name }}
+          zip -r9 ${{ matrix.name }}.zip *
+          aws lambda update-function-code --function-name ${{ matrix.name }} --zip-file fileb://${{ matrix.name }}.zip
