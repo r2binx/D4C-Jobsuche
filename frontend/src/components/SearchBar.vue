@@ -2,7 +2,7 @@
 import JobResult from "./JobResult.vue";
 
 const { data, error, loading, getData, abort } = useApi();
-const jobsStore = inject("jobsStore");
+const jobResultStore = inject("jobResultStore");
 
 const searchQuery = $ref({
 	search: "",
@@ -68,7 +68,7 @@ function makeRequest() {
 			};
 
 			// add result to store
-			jobsStore.addResults(newData?.result.stellenangebote, searchQuery.page);
+			jobResultStore.addData(newData?.result.stellenangebote, searchQuery.page);
 		});
 	});
 }
@@ -78,7 +78,7 @@ watch(
 	() => searchQuery.page,
 	(newPage) => {
 		console.log(`Page changed to ${newPage}`);
-		if (!jobsStore.getPage(newPage)) makeRequest();
+		if (!jobResultStore.getData(newPage)) makeRequest();
 	}
 );
 </script>
@@ -130,7 +130,7 @@ watch(
 				style="margin: 2rem 0; justify-content: center"
 			/>
 			<JobResult
-				v-for="result in jobsStore.getPage(searchQuery.page)"
+				v-for="result in jobResultStore.getData(searchQuery.page)"
 				:key="result.hashId"
 				:job="result"
 			/>

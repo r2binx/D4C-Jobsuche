@@ -1,11 +1,42 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
+<script setup lang="ts">
+import SignIn from "./components/SignIn.vue";
+import Profile from "./components/Profile.vue";
+import { AwsAuthService } from "./lib/AwsAuthService";
+
+const authService = inject("AwsAuthService") as AwsAuthService;
+const showUserModal = ref(false);
+
 </script>
 
 <template>
-	<h1>Jobsuche</h1>
+	<n-space align="center" item-style="margin-left: auto;">
+		<n-h1>Jobsuche</n-h1>
+		<n-space v-if="!!authService.currentUser.value" align="center" style="margin-top: -25px;">
+			<n-spin v-if="authService.loading.value"></n-spin>
+			<n-button v-else secondary @click="authService.signOut">Logout</n-button>
+			<n-avatar round size="large" src="https://img.icons8.com/ios-glyphs/344/user--v1.png"
+				@click="showUserModal = true" style="cursor: pointer" />
+		</n-space>
+		<n-space v-else align="center" style="margin-top: -25px;">
+			<n-spin v-if="authService.loading.value"></n-spin>
+			<n-button v-else secondary @click="showUserModal = true">Login</n-button>
+		</n-space>
+	</n-space>
+	<n-divider></n-divider>
 	<router-view />
+	<n-modal v-model:show="showUserModal">
+		<n-card style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
+			<n-spin v-if="!authService.initialized" />
+			<SignIn v-else-if="!authService.currentUser.value" />
+			<Profile v-else />
+			<template #footer>
+				<n-divider />
+				<n-space justify="end">
+					<n-button secondary @click="showUserModal = false">Schließen</n-button>
+				</n-space>
+			</template>
+		</n-card>
+	</n-modal>
 </template>
 
 <style>
