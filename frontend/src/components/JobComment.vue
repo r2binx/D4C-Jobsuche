@@ -17,25 +17,32 @@ watch(authService.currentUser, () => {
 
 </script>
 <template>
-    <div vertical :class="'comment' + (isOwnComment ? ' ownComment' : '')" style="width: 100%">
-        <n-card style="max-width: 80%">
-            <n-space vertical>
-                <n-text italic :type="isOwnComment ? 'success' : 'default'"
-                    :class="'comment' + (isOwnComment ? ' ownComment' : '')">
-                    {{ props.Comment.UserName + ", " }}{{ new Date(props.Comment.Timestamp).toLocaleString() }}
-                </n-text>
-                <n-text>
-                    {{ props.Comment.Text }}
-                </n-text>
-            </n-space>
-        </n-card>
+    <div :class="'comment' + (isOwnComment ? ' ownComment' : '')" style="width: 100%">
+        <div class="commentCard">
+            <n-text italic :type="isOwnComment ? 'success' : 'default'"
+                :class="'comment' + (isOwnComment ? ' ownComment' : '')">
+                {{ props.Comment.UserName + ", " }}{{ new Date(props.Comment.Timestamp).toLocaleString() }}
+            </n-text>
+            <n-text>
+                {{ props.Comment.Text }}
+            </n-text>
+        </div>
     </div>
 </template>
 
 <style>
+.commentCard {
+    width: 80%;
+    background-color: #ececec;
+    border-radius: 1em;
+    padding: 0 1em 1em 1em;
+}
+
 .comment {
     display: flex;
     justify-content: start;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 .ownComment {

@@ -21,14 +21,9 @@ if (!jobDetailStore.getData(props.id)) {
 
 
 const authService = inject("AwsAuthService") as AwsAuthService;
-const jobComments = ref<IJobComment[]>([]);
+const jobComments = ref<IJobComment[] | null>(null);
 const commentInput = ref<string | null>(null);
-
-watch(jobComments, (newComments) => {
-	newComments = Array.from(newComments.values()).sort((a, b) => {
-		return a.Timestamp - b.Timestamp
-	});
-})
+const commentConntainerRef = ref();
 
 const connecting = ref(true);
 const ws = new WebSocket("wss://21h1ym9kpl.execute-api.us-east-1.amazonaws.com/production");
@@ -43,10 +38,23 @@ ws.onmessage = (event) => {
 	const data = JSON.parse((event as any).data);
 	if (data.action == "signUpPage") {
 		connecting.value = false;
-		jobComments.value = data.Comments;
+		jobComments.value = data.Comments.length > 0 ? data.Comments.sort((a, b) => {
+			return b.Timestamp - a.Timestamp;
+		}) : null;
 	} else if (data.action == "commentJob") {
+		//sorry für den komischen code hier... aber Vue ignoriert einfach die Sortierung der Elemente im Array, auch beinem reactive array... so klappts jetzt auch wenns hässlich is :D
 		const comment = data.Comment as IJobComment;
-		jobComments.value.push(comment);
+		const newComments = Array.from(jobComments.value || []);
+		newComments.push(comment);
+		newComments.sort((a, b) => {
+			return b.Timestamp - a.Timestamp;
+		});
+		jobComments.value = null;
+		jobComments.value = newComments;
+		commentConntainerRef.value?.scrollTo({
+			top: 0,
+			behavior: 'smooth'
+		})
 		if (comment.RangeKeyHash == pendingCommentRKH.value) {
 			pendingCommentRKH.value = null;
 			commentInput.value = null;
@@ -138,10 +146,12 @@ onBeforeUnmount(() => {
 	<n-divider></n-divider>
 	<n-spin v-if="connecting"></n-spin>
 	<n-space v-else vertical>
-		<n-space vertical>
-			<JobComment v-for="comment in jobComments" :key="comment.Timestamp + comment.UserSub" :Comment="comment">
+		<div ref="commentConntainerRef" class="commentContainer">
+			<div v-if="!jobComments" class="noCommentsCard">Keine Kommentare</div>
+			<JobComment v-else v-for="comment in jobComments" :key="comment.Timestamp + comment.UserSub"
+				:Comment="comment">
 			</JobComment>
-		</n-space>
+		</div>
 		<n-space justify="end">
 			<n-input v-model:value="commentInput" placeholder="Kommentar..." @keyup.enter="sendComment"
 				:disabled="!authService.currentUser.value" />
@@ -149,9 +159,29 @@ onBeforeUnmount(() => {
 			<n-button v-else @click="sendComment" :disabled="!authService.currentUser.value">Senden</n-button>
 		</n-space>
 		<n-space justify="end">
-			<n-text v-if="!authService.currentUser.value" italic>Melden Sie sich an um an der Unterhaltung teilzunehmen.
+			<n-text v-if="!authService.currentUser.value" italic>Melden Sie sich an um an der Unterhaltung
+				teilzunehmen.
 			</n-text>
 		</n-space>
 	</n-space>
 </template>
+
+<style>
+.noCommentsCard {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0.5;
+}
+
+.commentContainer {
+	overflow: auto;
+	height: 300px;
+	line-height: 1.5;
+	display: flex;
+	flex-direction: column-reverse;
+}
+</style>
 
