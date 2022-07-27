@@ -15,7 +15,7 @@ if (!jobDetailStore.getData(props.id)) {
 	(getData as any)("/details/" + btoa(props.id));
 
 	watch(data, (newData) => {
-		jobDetailStore.addData(data, props.id);
+		jobDetailStore.addData((newData as any).result, props.id);
 	});
 }
 
@@ -95,9 +95,45 @@ onBeforeUnmount(() => {
 	{{ props.id }}
 	<n-card>
 		<n-spin v-if="loading" size="large" />
-		<pre v-else style="text-align: left">
-			{{ JSON.stringify(jobDetailStore.getData(props.id), null, 2) }}
-		</pre>
+		<n-space v-else style="text-align: left" vertical>
+			<n-h2>{{ jobDetailStore.getData(props.id).titel }}</n-h2>
+			<n-divider></n-divider>
+			<n-space vertical>
+				<div>
+					<n-text underline>
+						<n-h4>Beschreibung</n-h4>
+					</n-text>
+				</div>
+				<div style="margin-bottom: 2em;">
+					<pre
+						style="white-space: pre-wrap; font-family: unset;">{{ jobDetailStore.getData(props.id).stellenbeschreibung }}</pre>
+				</div>
+			</n-space>
+			<n-space vertical>
+				<div>
+					<n-text underline>
+						<n-h4>Information zum Arbeitsgeber</n-h4>
+					</n-text>
+				</div>
+				<div>
+					<a :href="jobDetailStore.getData(props.id).arbeitgeberdarstellungUrl" target="_blank">
+						{{ jobDetailStore.getData(props.id).arbeitgeber }}
+					</a>
+					<div>
+						Land: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.land }}
+					</div>
+					<div>
+						Ort: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.ort }}
+					</div>
+					<div>
+						Plz: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.plz }}
+					</div>
+					<div>
+						Straße: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.strasse }}
+					</div>
+				</div>
+			</n-space>
+		</n-space>
 	</n-card>
 	<n-divider></n-divider>
 	<n-spin v-if="connecting"></n-spin>
