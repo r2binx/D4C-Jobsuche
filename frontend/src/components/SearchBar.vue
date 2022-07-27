@@ -2,6 +2,8 @@
 import JobResult from "./JobResult.vue";
 
 const { data, error, loading, getData, abort } = useApi();
+const { getPredictions, suggestions } = useAutocomplete();
+
 const jobsStore = inject("jobsStore");
 
 const searchQuery = $ref({
@@ -81,6 +83,13 @@ watch(
 		if (!jobsStore.getPage(newPage)) makeRequest();
 	}
 );
+
+watch(
+	() => searchQuery.place,
+	(newPlace) => {
+		getPredictions(newPlace);
+	}
+);
 </script>
 <template>
 	<n-form ref="formRef" :model="searchQuery" style="margin-bottom: 1rem">
@@ -93,10 +102,10 @@ watch(
 				/>
 			</n-form-item>
 			<n-form-item label="Wo?" path="place">
-				<n-input
+				<n-auto-complete
 					v-model:value="searchQuery.place"
+					:options="suggestions"
 					placeholder="Ort"
-					@keyup.enter="makeRequest"
 				/>
 			</n-form-item>
 			<n-form-item label="Art?" path="type">
