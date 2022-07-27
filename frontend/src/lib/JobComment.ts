@@ -2,6 +2,6 @@ export interface IJobComment {
 	Text: string;
 	UserSub: string;
 	UserName: string;
-	Timestamp: string;
+	Timestamp: number;
 	RangeKeyHash: string;
 }

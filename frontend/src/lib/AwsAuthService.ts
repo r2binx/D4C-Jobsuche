@@ -12,8 +12,8 @@ import {
 } from "amazon-cognito-identity-js";
 
 export class AwsAuthService {
-	private readonly COGNITO_USER_POOL_ID = "us-east-1_sGF3VjTWd";
-	private readonly COGNITO_CLIENT_ID = "7du8h0c7hsllehjhv05a35n9pm";
+	private readonly COGNITO_USER_POOL_ID = "us-east-1_0wzzrGL8e";
+	private readonly COGNITO_CLIENT_ID = "4kr817atebosg4cssr7lfbjcf8";
 
 	private userPool = new CognitoUserPool({
 		UserPoolId: this.COGNITO_USER_POOL_ID,

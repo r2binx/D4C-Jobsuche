@@ -168,7 +168,7 @@ resource "aws_dynamodb_table" "job_commments_table" {
 
   attribute {
     name = "Timestamp"
-    type = "S"
+    type = "N"
   }
 }
 

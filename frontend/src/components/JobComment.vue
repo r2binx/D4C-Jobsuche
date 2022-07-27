@@ -22,7 +22,7 @@ watch(authService.currentUser, () => {
             <n-space vertical>
                 <n-text italic :type="isOwnComment ? 'success' : 'default'"
                     :class="'comment' + (isOwnComment ? ' ownComment' : '')">
-                    {{ props.Comment.UserName + ", " }}{{ props.Comment.Timestamp }}
+                    {{ props.Comment.UserName + ", " }}{{ new Date(props.Comment.Timestamp).toLocaleString() }}
                 </n-text>
                 <n-text>
                     {{ props.Comment.Text }}

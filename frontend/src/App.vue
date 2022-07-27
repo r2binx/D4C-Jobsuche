@@ -10,7 +10,9 @@ const showUserModal = ref(false);
 
 <template>
 	<n-space align="center" item-style="margin-left: auto;">
-		<n-h1>Jobsuche</n-h1>
+		<router-link :to="'/'">
+			<n-h1>Jobsuche</n-h1>
+		</router-link>
 		<n-space v-if="!!authService.currentUser.value" align="center" style="margin-top: -25px;">
 			<n-spin v-if="authService.loading.value"></n-spin>
 			<n-button v-else secondary @click="authService.signOut">Logout</n-button>

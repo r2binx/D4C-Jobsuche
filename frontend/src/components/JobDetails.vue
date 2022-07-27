@@ -24,8 +24,14 @@ const authService = inject("AwsAuthService") as AwsAuthService;
 const jobComments = ref<IJobComment[]>([]);
 const commentInput = ref<string | null>(null);
 
+watch(jobComments, (newComments) => {
+	newComments = Array.from(newComments.values()).sort((a, b) => {
+		return a.Timestamp - b.Timestamp
+	});
+})
+
 const connecting = ref(true);
-const ws = new WebSocket("wss://2lj1k4icad.execute-api.us-east-1.amazonaws.com/production");
+const ws = new WebSocket("wss://21h1ym9kpl.execute-api.us-east-1.amazonaws.com/production");
 ws.onopen = (event) => {
 	const message = {
 		action: "signUpPage",
@@ -61,7 +67,7 @@ const sendComment = () => {
 		return console.log("Not logged in!");
 	}
 
-	const now = new Date().toLocaleString();
+	const now = new Date().getTime();
 
 	const comment: IJobComment = {
 		Text: commentInput.value,
