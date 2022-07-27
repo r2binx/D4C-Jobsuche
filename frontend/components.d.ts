@@ -5,7 +5,7 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    JobDetailCommentSection: typeof import('./src/components/JobDetailCommentSection.vue')['default']
+    JobComment: typeof import('./src/components/JobComment.vue')['default']
     JobDetails: typeof import('./src/components/JobDetails.vue')['default']
     JobResult: typeof import('./src/components/JobResult.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']

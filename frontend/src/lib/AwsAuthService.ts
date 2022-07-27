@@ -12,8 +12,8 @@ import {
 } from "amazon-cognito-identity-js";
 
 export class AwsAuthService {
-	private readonly COGNITO_USER_POOL_ID = "us-east-1_vHpuyRkO7";
-	private readonly COGNITO_CLIENT_ID = "79v46nq3uhinll63j38831ivqj";
+	private readonly COGNITO_USER_POOL_ID = "us-east-1_fIG6bC5R1";
+	private readonly COGNITO_CLIENT_ID = "6srpooid5lb4ftq8jth1fmi5os";
 
 	private userPool = new CognitoUserPool({
 		UserPoolId: this.COGNITO_USER_POOL_ID,
@@ -52,6 +52,7 @@ export class AwsAuthService {
 		this.currentUser.value = {
 			Username: data["cognito:username"],
 			Email: data.email,
+			Sub: data.sub,
 			IdToken: idToken.getJwtToken(),
 			RefreshToken: refreshToken,
 		};
@@ -176,6 +177,7 @@ export interface UserData {
 	Username: string;
 	Password?: string;
 	Email: string;
+	Sub: string;
 	IdToken: string;
 	RefreshToken: CognitoRefreshToken;
 }

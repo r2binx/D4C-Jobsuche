@@ -86,32 +86,16 @@ watch(
 	<n-form ref="formRef" :model="searchQuery" style="margin-bottom: 1rem">
 		<n-space justify="space-around" align="center">
 			<n-form-item label="Was?" path="search">
-				<n-input
-					v-model:value="searchQuery.search"
-					placeholder="Suche"
-					@keyup.enter="makeRequest"
-				/>
+				<n-input v-model:value="searchQuery.search" placeholder="Suche" @keyup.enter="makeRequest" />
 			</n-form-item>
 			<n-form-item label="Wo?" path="place">
-				<n-input
-					v-model:value="searchQuery.place"
-					placeholder="Ort"
-					@keyup.enter="makeRequest"
-				/>
+				<n-input v-model:value="searchQuery.place" placeholder="Ort" @keyup.enter="makeRequest" />
 			</n-form-item>
 			<n-form-item label="Art?" path="type">
-				<n-select
-					v-model:value="searchQuery.type"
-					style="width: 200px"
-					:options="typeOptions"
-				/>
+				<n-select v-model:value="searchQuery.type" style="width: 200px" :options="typeOptions" />
 			</n-form-item>
 			<n-form-item label="Umkreis?" path="radius">
-				<n-input-number
-					v-model:value="searchQuery.radius"
-					:step="5"
-					style="width: 120px"
-				>
+				<n-input-number v-model:value="searchQuery.radius" :step="5" style="width: 120px">
 					<template #suffix>Km</template>
 				</n-input-number>
 			</n-form-item>
@@ -123,23 +107,11 @@ watch(
 	<n-spin v-if="loading" size="large" />
 	<template v-else>
 		<div v-if="!error">
-			<n-pagination
-				v-if="searchQuery.totalPages"
-				v-model:page="searchQuery.page"
-				:page-count="searchQuery.totalPages"
-				style="margin: 2rem 0; justify-content: center"
-			/>
-			<JobResult
-				v-for="result in jobResultStore.getData(searchQuery.page)"
-				:key="result.hashId"
-				:job="result"
-			/>
-			<n-pagination
-				v-if="searchQuery.totalPages"
-				v-model:page="searchQuery.page"
-				:page-count="searchQuery.totalPages"
-				style="margin: 2rem 0; justify-content: center"
-			/>
+			<n-pagination v-if="searchQuery.totalPages" v-model:page="searchQuery.page"
+				:page-count="searchQuery.totalPages" style="margin: 2rem 0; justify-content: center" />
+			<JobResult v-for="result in jobResultStore.getData(searchQuery.page)" :key="result.hashId" :job="result" />
+			<n-pagination v-if="searchQuery.totalPages" v-model:page="searchQuery.page"
+				:page-count="searchQuery.totalPages" style="margin: 2rem 0; justify-content: center" />
 		</div>
 		<pre v-else>{{ error }}</pre>
 	</template>

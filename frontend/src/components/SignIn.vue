@@ -77,12 +77,12 @@ function authenticate() {
                     <n-input v-model:value="userFormData.Email" />
                 </n-form-item>
             </n-form>
-            <div>
+            <n-space>
                 <n-spin v-if="authService.loading.value" />
                 <n-button v-else-if="register == 0" type="primary" @click="authenticate">Login</n-button>
                 <n-button v-else type="primary" @click="authenticate">Registrieren</n-button>
-            </div>
-            <div>
+            </n-space>
+            <n-space style="margin: 1rem">
                 <n-alert v-if="authState == AuthState.EmailTaken" title="Fehler" type="error">
                     Diese Email wird bereits verwendet!
                 </n-alert>
@@ -102,7 +102,7 @@ function authenticate() {
                 <n-alert v-if="authState == AuthState.LoginFailed" title="Fehler" type="error">
                     Falscher Benutzername oder Passwort.
                 </n-alert>
-            </div>
+            </n-space>
         </n-space>
     </div>
 </template>
