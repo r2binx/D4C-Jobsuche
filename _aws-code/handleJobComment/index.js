@@ -31,7 +31,7 @@ exports.handler = async (event) => {
     //save comment to db
     const commentDb = {
       JobId: jobId,
-      RangeKeyHash: comment.UserSub + comment.Timestamp,
+      RangeKeyHash: comment.RangeKeyHash,
       Text: comment.Text,
       Timestamp: comment.Timestamp,
       UserName: comment.UserName,

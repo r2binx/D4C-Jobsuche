@@ -12,8 +12,8 @@ import {
 } from "amazon-cognito-identity-js";
 
 export class AwsAuthService {
-	private readonly COGNITO_USER_POOL_ID = "us-east-1_fIG6bC5R1";
-	private readonly COGNITO_CLIENT_ID = "6srpooid5lb4ftq8jth1fmi5os";
+	private readonly COGNITO_USER_POOL_ID = "us-east-1_sGF3VjTWd";
+	private readonly COGNITO_CLIENT_ID = "7du8h0c7hsllehjhv05a35n9pm";
 
 	private userPool = new CognitoUserPool({
 		UserPoolId: this.COGNITO_USER_POOL_ID,
@@ -186,4 +186,5 @@ export enum AwsErrorCode {
 	NewPasswordRequired,
 	VerifyEmailRequired,
 	InvalidLogin,
+	PasswordRepeatNoMatch,
 }

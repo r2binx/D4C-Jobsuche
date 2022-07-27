@@ -3,4 +3,5 @@ export interface IJobComment {
 	UserSub: string;
 	UserName: string;
 	Timestamp: string;
+	RangeKeyHash: string;
 }

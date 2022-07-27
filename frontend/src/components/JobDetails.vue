@@ -25,7 +25,7 @@ const jobComments = ref<IJobComment[]>([]);
 const commentInput = ref<string | null>(null);
 
 const connecting = ref(true);
-const ws = new WebSocket("wss://509ov5e9ok.execute-api.us-east-1.amazonaws.com/production");
+const ws = new WebSocket("wss://2lj1k4icad.execute-api.us-east-1.amazonaws.com/production");
 ws.onopen = (event) => {
 	const message = {
 		action: "signUpPage",
@@ -41,27 +41,41 @@ ws.onmessage = (event) => {
 	} else if (data.action == "commentJob") {
 		const comment = data.Comment as IJobComment;
 		jobComments.value.push(comment);
+		if (comment.RangeKeyHash == pendingCommentRKH.value) {
+			pendingCommentRKH.value = null;
+			commentInput.value = null;
+		}
 	}
 }
 ws.onerror = (event) => {
 	console.error(event);
 }
 
+const pendingCommentRKH = ref<string | null>(null);
+
 const sendComment = () => {
 	if (!commentInput.value) {
 		return console.log("Empty message!");
 	}
+	if (!authService.currentUser.value) {
+		return console.log("Not logged in!");
+	}
+
+	const now = new Date().toLocaleString();
+
 	const comment: IJobComment = {
 		Text: commentInput.value,
-		Timestamp: new Date().toLocaleString(),
-		UserName: authService.currentUser.value?.Username || "12345",
-		UserSub: authService.currentUser.value?.Sub || "12345",
+		Timestamp: now,
+		UserName: authService.currentUser.value.Username,
+		UserSub: authService.currentUser.value.Sub,
+		RangeKeyHash: authService.currentUser.value.Sub + now,
 	};
 	const message = {
 		action: "commentJob",
-		Authorization: authService.currentUser.value?.IdToken || "asdf12345",
+		Authorization: authService.currentUser.value.IdToken,
 		Comment: comment
 	}
+	pendingCommentRKH.value = comment.RangeKeyHash;
 	ws.send(JSON.stringify(message));
 };
 
@@ -69,12 +83,8 @@ const sendComment = () => {
 onBeforeUnmount(() => {
 	ws.close(1000);
 });
-
-
-/*
-disabled={{!authService.currentUser.value}}
- disabled={{!authService.currentUser.value}}*/
 </script>
+
 <template>
 	{{ props.id }}
 	<n-card>
@@ -83,6 +93,7 @@ disabled={{!authService.currentUser.value}}
 			{{ JSON.stringify(jobDetailStore.getData(props.id), null, 2) }}
 		</pre>
 	</n-card>
+	<n-divider></n-divider>
 	<n-spin v-if="connecting"></n-spin>
 	<n-space v-else vertical>
 		<n-space vertical>
@@ -90,11 +101,13 @@ disabled={{!authService.currentUser.value}}
 			</JobComment>
 		</n-space>
 		<n-space justify="end">
-			<n-input v-model:value="commentInput" placeholder="Kommentar..." @keyup.enter="sendComment" />
-			<n-button @click="sendComment">Senden</n-button>
+			<n-input v-model:value="commentInput" placeholder="Kommentar..." @keyup.enter="sendComment"
+				:disabled="!authService.currentUser.value" />
+			<n-spin v-if="pendingCommentRKH"></n-spin>
+			<n-button v-else @click="sendComment" :disabled="!authService.currentUser.value">Senden</n-button>
 		</n-space>
 		<n-space justify="end">
-			<n-text v-if="!authService.currentUser.value">Melden Sie sich an um an der Unterhaltung teilzunehmen.
+			<n-text v-if="!authService.currentUser.value" italic>Melden Sie sich an um an der Unterhaltung teilzunehmen.
 			</n-text>
 		</n-space>
 	</n-space>

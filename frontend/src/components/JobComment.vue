@@ -11,28 +11,34 @@ const props = defineProps({
 const authService = inject("AwsAuthService") as AwsAuthService;
 const isOwnComment = ref(props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false);
 
-/*  <n-space vertical justify={{isOwnComment? "end" : "start" }}>
-        <n-card>
-            <div>
-                <n-text>{{ props.data.UserName }}</n-text>
-                <n-text style="{{isOwnComment ? " color: red" : "color: black" }}">{{ props.data.Timestamp }}</n-text>
-            </div>
-            <div>
-                <n-text>{{ props.data.Text }}</n-text>
-            </div>
-        </n-card>
-    </n-space>*/
+watch(authService.currentUser, () => {
+    isOwnComment.value = props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false;
+})
 
 </script>
 <template>
-    <n-card>
-        <n-space vertical>
-            <n-text>
-                {{ props.Comment.UserName }}{{ props.Comment.Timestamp }}
-            </n-text>
-            <n-text>
-                {{ props.Comment.Text }}
-            </n-text>
-        </n-space>
-    </n-card>
+    <div vertical :class="'comment' + (isOwnComment ? ' ownComment' : '')" style="width: 100%">
+        <n-card style="max-width: 80%">
+            <n-space vertical>
+                <n-text italic :type="isOwnComment ? 'success' : 'default'"
+                    :class="'comment' + (isOwnComment ? ' ownComment' : '')">
+                    {{ props.Comment.UserName + ", " }}{{ props.Comment.Timestamp }}
+                </n-text>
+                <n-text>
+                    {{ props.Comment.Text }}
+                </n-text>
+            </n-space>
+        </n-card>
+    </div>
 </template>
+
+<style>
+.comment {
+    display: flex;
+    justify-content: start;
+}
+
+.ownComment {
+    justify-content: end;
+}
+</style>

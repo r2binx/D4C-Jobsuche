@@ -6,7 +6,8 @@ enum AuthState {
     EmailTaken,
     SuccesRegister,
     ValidateEmailRequired,
-    LoginFailed
+    LoginFailed,
+    PasswordRepeatNoMatch
 }
 
 const authService = inject("AwsAuthService") as AwsAuthService;
@@ -31,11 +32,12 @@ function authenticate() {
         if (errors) return console.error(errors);
         try {
             if (register.value == 1) {
-                console.log("Register")
+                if (userFormData.Password !== userFormData.PasswordRepeat) {
+                    throw AwsErrorCode.PasswordRepeatNoMatch;
+                }
                 await authService.register(userFormData.Username, userFormData.Password, userFormData.Email);
                 authState.value = AuthState.SuccesRegister;
             } else {
-                console.log("Login")
                 await authService.signIn(userFormData.Username, userFormData.Password);
             }
         } catch (error) {
@@ -45,6 +47,9 @@ function authenticate() {
                     break;
                 case AwsErrorCode.VerifyEmailRequired:
                     authState.value = AuthState.ValidateEmailRequired;
+                    break;
+                case AwsErrorCode.PasswordRepeatNoMatch:
+                    authState.value = AuthState.PasswordRepeatNoMatch;
                     break;
             }
         }
@@ -65,22 +70,25 @@ function authenticate() {
         <n-space vertical align="center">
             <n-form ref="formRef" :model="userFormData" style="margin: 1rem">
                 <n-form-item label="Benutzername" path="Username">
-                    <n-input v-model:value="userFormData.Username" />
+                    <n-input v-model:value="userFormData.Username" @keyup.enter="authenticate" />
                 </n-form-item>
                 <n-form-item label="Passwort" path="Password">
-                    <n-input v-model:value="userFormData.Password" type="password" />
+                    <n-input v-model:value="userFormData.Password" type="password" @keyup.enter="authenticate" />
                 </n-form-item>
                 <n-form-item v-if="register == 1" label="Passwort wiederholen" path="PasswordRepeat">
-                    <n-input v-model:value="userFormData.PasswordRepeat" type="password" />
+                    <n-input v-model:value="userFormData.PasswordRepeat" type="password" @keyup.enter="authenticate" />
                 </n-form-item>
                 <n-form-item v-if="register == 1" label="Email" path="Email">
-                    <n-input v-model:value="userFormData.Email" />
+                    <n-input v-model:value="userFormData.Email" @keyup.enter="authenticate" />
                 </n-form-item>
             </n-form>
             <n-space>
                 <n-spin v-if="authService.loading.value" />
-                <n-button v-else-if="register == 0" type="primary" @click="authenticate">Login</n-button>
-                <n-button v-else type="primary" @click="authenticate">Registrieren</n-button>
+                <n-button v-else-if="register == 0" type="primary" @click="authenticate" @keyup.enter="authenticate">
+                    Login
+                </n-button>
+                <n-button v-else type="primary" @click="authenticate" @keyup.enter="authenticate">Registrieren
+                </n-button>
             </n-space>
             <n-space style="margin: 1rem">
                 <n-alert v-if="authState == AuthState.EmailTaken" title="Fehler" type="error">
@@ -101,6 +109,9 @@ function authenticate() {
                 </n-alert>
                 <n-alert v-if="authState == AuthState.LoginFailed" title="Fehler" type="error">
                     Falscher Benutzername oder Passwort.
+                </n-alert>
+                <n-alert v-if="authState == AuthState.PasswordRepeatNoMatch" title="Fehler" type="error">
+                    Passwörter stimmen nicht überein!
                 </n-alert>
             </n-space>
         </n-space>
