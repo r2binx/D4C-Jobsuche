@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@googlemaps/js-api-loader": "^1.14.3",
+		"amazon-cognito-identity-js": "^5.2.10",
 		"vue": "3.2.37",
 		"vue-router": "4.1.2"
 	},
