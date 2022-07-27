@@ -52,6 +52,7 @@
     "unref": true,
     "useApi": true,
     "useAttrs": true,
+    "useAutocomplete": true,
     "useCssModule": true,
     "useCssVars": true,
     "useRoute": true,

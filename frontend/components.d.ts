@@ -33,6 +33,7 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/SearchBar.vue')['default']
     SignIn: typeof import('./src/components/SignIn.vue')['default']
+    NAutoComplete: typeof import('naive-ui')['NAutoComplete']
   }
 }
 

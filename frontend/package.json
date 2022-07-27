@@ -10,20 +10,22 @@
 		"format": "prettier .  --write"
 	},
 	"dependencies": {
-		"vue": "3.2.36",
-		"vue-router": "4.0.15"
+		"@googlemaps/js-api-loader": "^1.14.3",
+		"vue": "3.2.37",
+		"vue-router": "4.1.2"
 	},
 	"devDependencies": {
-		"@vitejs/plugin-vue": "^2.3.3",
-		"eslint": "^8.16.0",
+		"@types/google.maps": "^3.49.2",
+		"@vitejs/plugin-vue": "^3.0.1",
+		"eslint": "^8.20.0",
 		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-vue": "^9.1.0",
+		"eslint-plugin-vue": "^9.3.0",
 		"naive-ui": "^2.31.0",
-		"prettier": "^2.6.2",
-		"unplugin-auto-import": "^0.8.6",
-		"unplugin-vue-components": "^0.19.6",
-		"vite": "^2.9.9",
-		"vite-plugin-inspect": "^0.5.0",
-		"vite-plugin-pages": "^0.23.0"
+		"prettier": "^2.7.1",
+		"unplugin-auto-import": "^0.10.1",
+		"unplugin-vue-components": "^0.21.1",
+		"vite": "^3.0.3",
+		"vite-plugin-inspect": "^0.6.0",
+		"vite-plugin-pages": "^0.25.0"
 	}
 }
