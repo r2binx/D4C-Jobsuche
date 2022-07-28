@@ -62,11 +62,31 @@ exports.handler = async (event) => {
     const response = { action: "commentJob", Comment: comment };
 
     //post comment to all connections
+    const goneConnections = [];
     for (let item of connectionsForJob.Items) {
-      await callbackAPI
-        .postToConnection({
-          ConnectionId: item.ConnectionId,
-          Data: JSON.stringify(response),
+      try {
+        await callbackAPI
+          .postToConnection({
+            ConnectionId: item.ConnectionId,
+            Data: JSON.stringify(response),
+          })
+          .promise();
+      } catch (e) {
+        if (e.code == 410) {
+          //gone exception
+          goneConnections.push(item);
+        }
+      }
+    }
+
+    for (let item of goneConnections) {
+      await ddb
+        .delete({
+          TableName: process.env.job_websocket_connections_table,
+          Key: {
+            JobId: item.JobId,
+            ConnectionId: item.ConnectionId,
+          },
         })
         .promise();
     }
