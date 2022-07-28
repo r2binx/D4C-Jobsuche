@@ -1,7 +1,7 @@
 export function useApi() {
-	const data = $ref(null);
-	const error = $ref(null);
-	const loading = $ref(false);
+	let data = $ref(null);
+	let error = $ref(null);
+	let loading = $ref(false);
 	const controller = new AbortController();
 
 	const abort = () => controller.abort();

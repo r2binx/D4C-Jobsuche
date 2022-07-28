@@ -1,7 +1,5 @@
-<script setup lang="ts">
-import { AwsAuthService } from "../lib/AwsAuthService";
-
-const authService = inject("AwsAuthService") as AwsAuthService;
+<script setup>
+const { loading: authLoading, currentUser, signOut } = inject("AwsAuthService");
 </script>
 
 <template>
@@ -13,14 +11,14 @@ const authService = inject("AwsAuthService") as AwsAuthService;
 		<n-space vertical align="center">
 			<n-space justify="space-around">
 				<n-text>Benutzername:</n-text>
-				<n-text strong>{{ authService.currentUser.value?.Username }}</n-text>
+				<n-text strong>{{ currentUser?.Username }}</n-text>
 			</n-space>
 			<n-space justify="space-around">
 				<n-text>Email:</n-text>
-				<n-text strong>{{ authService.currentUser.value?.Email }}</n-text>
+				<n-text strong>{{ currentUser?.Email }}</n-text>
 			</n-space>
-			<n-spin v-if="authService.loading.value"></n-spin>
-			<n-button v-else secondary @click="authService.signOut">Logout</n-button>
+			<n-spin v-if="authLoading"></n-spin>
+			<n-button v-else secondary @click="signOut">Logout</n-button>
 		</n-space>
 	</div>
 </template>

@@ -1,7 +1,7 @@
 import { Loader } from "@googlemaps/js-api-loader";
 
 export function useAutocomplete() {
-	const suggestions = $ref([]);
+	let suggestions = $ref([]);
 	const autocompleteOptions = {
 		types: ["(cities)"],
 		componentRestrictions: { country: "de" },
@@ -35,7 +35,7 @@ export function useAutocomplete() {
 
 	function updateSuggestions(predictions, status) {
 		if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
-			const searchResults = [];
+			suggestions = [];
 			return;
 		}
 		suggestions = [

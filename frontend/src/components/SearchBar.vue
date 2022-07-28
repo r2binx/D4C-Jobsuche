@@ -1,11 +1,9 @@
 <script setup>
-import JobResult from "./JobResult.vue";
-
 const { data, error, loading, getData, abort } = useApi();
 const { getPredictions, suggestions } = useAutocomplete();
 const jobResultStore = inject("jobResultStore");
 
-const searchQuery = $ref({
+let searchQuery = $ref({
 	search: "",
 	place: "",
 	radius: 15,
@@ -32,7 +30,7 @@ const typeOptions = [
 	},
 ];
 
-const formRef = ref();
+const formRef = $ref();
 
 function buildQuery(query) {
 	let parameters = {
@@ -53,7 +51,7 @@ function buildQuery(query) {
 }
 
 function makeRequest() {
-	formRef.value.validate((errors) => {
+	formRef.validate((errors) => {
 		if (errors) return console.error(errors);
 
 		// make request

@@ -1,16 +1,3 @@
-import { reactive, ref } from "vue";
-import {
-	CognitoUserPool,
-	CognitoUserAttribute,
-	CognitoUser,
-	AuthenticationDetails,
-	CognitoUserSession,
-	IAuthenticationDetailsData,
-	CognitoIdToken,
-	CognitoRefreshToken,
-	ISignUpResult,
-} from "amazon-cognito-identity-js";
-
 export class AwsAuthService {
 	private readonly COGNITO_USER_POOL_ID = "us-east-1_0wzzrGL8e";
 	private readonly COGNITO_CLIENT_ID = "4kr817atebosg4cssr7lfbjcf8";
@@ -22,7 +9,7 @@ export class AwsAuthService {
 	private cognitoUser: CognitoUser | null = null;
 
 	public initialized = ref(false);
-	public currentUser = ref<UserData | null>(null);
+	public currentUser = ref<UserData>(null);
 	public loading = ref(false);
 
 	public init = async () => {

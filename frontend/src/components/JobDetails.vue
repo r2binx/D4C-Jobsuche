@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { AwsAuthService } from "../lib/AwsAuthService";
 import { IJobComment } from "../lib/JobComment";
 
 const props = defineProps({
@@ -20,15 +19,13 @@ if (!jobDetailStore.getData(props.id)) {
 	});
 }
 
-const authService = inject("AwsAuthService") as AwsAuthService;
-const jobComments = ref<IJobComment[] | null>(null);
-const commentInput = ref<string | null>(null);
-const commentConntainerRef = ref();
+const { currentUser } = $(inject("AwsAuthService") as AwsAuthService);
+let jobComments = $ref<IJobComment[]>(null);
+let commentInput = $ref<string>(null);
+let commentConntainerRef = $ref();
 
-const connecting = ref(true);
-const ws = new WebSocket(
-	"wss://21h1ym9kpl.execute-api.us-east-1.amazonaws.com/production"
-);
+let connecting = $ref(true);
+const ws = new WebSocket("wss://" + import.meta.env.VITE_WS_ENDPOINT);
 ws.onopen = (event) => {
 	const message = {
 		action: "signUpPage",
@@ -39,8 +36,8 @@ ws.onopen = (event) => {
 ws.onmessage = (event) => {
 	const data = JSON.parse((event as any).data);
 	if (data.action == "signUpPage") {
-		connecting.value = false;
-		jobComments.value =
+		connecting = false;
+		jobComments =
 			data.Comments.length > 0
 				? data.Comments.sort((a, b) => {
 						return b.Timestamp - a.Timestamp;
@@ -49,20 +46,20 @@ ws.onmessage = (event) => {
 	} else if (data.action == "commentJob") {
 		//sorry für den komischen code hier... aber Vue ignoriert einfach die Sortierung der Elemente im Array, auch beinem reactive array... so klappts jetzt auch wenns hässlich is :D
 		const comment = data.Comment as IJobComment;
-		const newComments = Array.from(jobComments.value || []);
+		const newComments = Array.from(jobComments || []);
 		newComments.push(comment);
 		newComments.sort((a, b) => {
 			return b.Timestamp - a.Timestamp;
 		});
-		jobComments.value = null;
-		jobComments.value = newComments;
-		commentConntainerRef.value?.scrollTo({
+		jobComments = null;
+		jobComments = newComments;
+		commentConntainerRef?.scrollTo({
 			top: 0,
 			behavior: "smooth",
 		});
-		if (comment.RangeKeyHash == pendingCommentRKH.value) {
-			pendingCommentRKH.value = null;
-			commentInput.value = null;
+		if (comment.RangeKeyHash == pendingCommentRKH) {
+			pendingCommentRKH = null;
+			commentInput = null;
 		}
 	}
 };
@@ -70,31 +67,31 @@ ws.onerror = (event) => {
 	console.error(event);
 };
 
-const pendingCommentRKH = ref<string | null>(null);
+const pendingCommentRKH = $ref<string>(null);
 
 const sendComment = () => {
-	if (!commentInput.value) {
+	if (!commentInput) {
 		return console.log("Empty message!");
 	}
-	if (!authService.currentUser.value) {
+	if (!currentUser) {
 		return console.log("Not logged in!");
 	}
 
 	const now = new Date().getTime();
 
 	const comment: IJobComment = {
-		Text: commentInput.value,
+		Text: commentInput,
 		Timestamp: now,
-		UserName: authService.currentUser.value.Username,
-		UserSub: authService.currentUser.value.Sub,
-		RangeKeyHash: authService.currentUser.value.Sub + now,
+		UserName: currentUser.Username,
+		UserSub: currentUser.Sub,
+		RangeKeyHash: currentUser.Sub + now,
 	};
 	const message = {
 		action: "commentJob",
-		Authorization: authService.currentUser.value.IdToken,
+		Authorization: currentUser.IdToken,
 		Comment: comment,
 	};
-	pendingCommentRKH.value = comment.RangeKeyHash;
+	pendingCommentRKH = comment.RangeKeyHash;
 	ws.send(JSON.stringify(message));
 };
 
@@ -173,7 +170,7 @@ onBeforeUnmount(() => {
 				v-else
 				v-for="comment in jobComments"
 				:key="comment.Timestamp + comment.UserSub"
-				:Comment="comment"
+				:userComment="comment"
 			>
 			</JobComment>
 		</div>
@@ -182,18 +179,15 @@ onBeforeUnmount(() => {
 				v-model:value="commentInput"
 				placeholder="Kommentar..."
 				@keyup.enter="sendComment"
-				:disabled="!authService.currentUser.value"
+				:disabled="!currentUser"
 			/>
 			<n-spin v-if="pendingCommentRKH"></n-spin>
-			<n-button
-				v-else
-				@click="sendComment"
-				:disabled="!authService.currentUser.value"
+			<n-button v-else @click="sendComment" :disabled="!currentUser"
 				>Senden</n-button
 			>
 		</n-space>
 		<n-space justify="end">
-			<n-text v-if="!authService.currentUser.value" italic
+			<n-text v-if="!currentUser" italic
 				>Melden Sie sich an um an der Unterhaltung teilzunehmen.
 			</n-text>
 		</n-space>

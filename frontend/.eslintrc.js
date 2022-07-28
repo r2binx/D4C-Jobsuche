@@ -1,4 +1,5 @@
 module.exports = {
+	parser: "vue-eslint-parser",
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
@@ -10,12 +11,9 @@ module.exports = {
 	},
 	extends: [
 		"eslint:recommended",
-		"plugin:vue/base",
 		"plugin:vue/vue3-recommended",
 		"./.eslintrc-auto-import.json",
 		"prettier",
 	],
-	rules: {
-		"vue/script-setup-uses-vars": "error",
-	},
+	ignorePatterns: ["**/*.ts"],
 };

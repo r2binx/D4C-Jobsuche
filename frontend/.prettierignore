@@ -1,3 +1,4 @@
 **/dist
 **/.vscode
 **/pnpm-lock.yaml
+**/node_modules

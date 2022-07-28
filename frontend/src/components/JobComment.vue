@@ -2,20 +2,19 @@
 import { AwsAuthService } from "../lib/AwsAuthService";
 import { IJobComment } from "../lib/JobComment";
 const props = defineProps({
-	Comment: {
+	userComment: {
 		type: Object as () => IJobComment,
 		required: true,
 	},
 });
 
 const authService = inject("AwsAuthService") as AwsAuthService;
-const isOwnComment = ref(
-	props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false
-);
+const currentUser = $(authService.currentUser);
 
-watch(authService.currentUser, () => {
-	isOwnComment.value =
-		props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false;
+let isOwnComment = $ref(props.userComment.UserSub == currentUser?.Sub ? true : false);
+
+watch(currentUser, () => {
+	isOwnComment = props.userComment.UserSub == currentUser?.Sub ? true : false;
 });
 </script>
 <template>
@@ -26,11 +25,11 @@ watch(authService.currentUser, () => {
 				:type="isOwnComment ? 'success' : 'default'"
 				:class="'comment' + (isOwnComment ? ' ownComment' : '')"
 			>
-				{{ props.Comment.UserName + ", "
-				}}{{ new Date(props.Comment.Timestamp).toLocaleString() }}
+				{{ props.userComment.UserName + ", "
+				}}{{ new Date(props.userComment.Timestamp).toLocaleString() }}
 			</n-text>
 			<n-text>
-				{{ props.Comment.Text }}
+				{{ props.userComment.Text }}
 			</n-text>
 		</div>
 	</div>

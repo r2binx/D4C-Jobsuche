@@ -1,0 +1,15 @@
+{
+	"extends": "@vue/tsconfig/tsconfig.web.json",
+	"include": [
+		"auto-imports.d.ts",
+		"components.d.ts",
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue"
+	],
+	"compilerOptions": {
+		"strict": false
+	},
+	"exclude": ["node_modules"]
+}
