@@ -1,11 +1,9 @@
-import { reactive, ref } from "vue";
 import {
 	CognitoUserPool,
 	CognitoUserAttribute,
 	CognitoUser,
 	AuthenticationDetails,
 	CognitoUserSession,
-	IAuthenticationDetailsData,
 	CognitoIdToken,
 	CognitoRefreshToken,
 	ISignUpResult,
@@ -22,7 +20,7 @@ export class AwsAuthService {
 	private cognitoUser: CognitoUser | null = null;
 
 	public initialized = ref(false);
-	public currentUser = ref<UserData | null>(null);
+	public currentUser = ref<UserData>(null);
 	public loading = ref(false);
 
 	public init = async () => {

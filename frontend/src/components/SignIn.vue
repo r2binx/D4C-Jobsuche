@@ -10,8 +10,12 @@ enum AuthState {
 	PasswordRepeatNoMatch,
 }
 
-const authService = inject("AwsAuthService") as AwsAuthService;
-const register = ref(0);
+const {
+	register: registerUser,
+	signIn,
+	loading,
+} = $(inject("AwsAuthService") as AwsAuthService);
+const register = $ref(0);
 const userFormData = $ref({
 	Username: "",
 	Password: "",
@@ -21,44 +25,41 @@ const userFormData = $ref({
 
 const formRef = ref();
 
-const authState = ref(AuthState.None);
+let authState = $ref<AuthState>(AuthState.None);
 
-watch(
-	() => register.value,
-	() => {
-		authState.value = AuthState.None;
-	}
-);
+watch($$(register), () => {
+	authState = AuthState.None;
+});
 
 function authenticate() {
-	authState.value = AuthState.None;
+	authState = AuthState.None;
 
 	formRef.value.validate(async (errors) => {
 		if (errors) return console.error(errors);
 		try {
-			if (register.value == 1) {
+			if (register == 1) {
 				if (userFormData.Password !== userFormData.PasswordRepeat) {
 					throw AwsErrorCode.PasswordRepeatNoMatch;
 				}
-				await authService.register(
+				await registerUser(
 					userFormData.Username,
 					userFormData.Password,
 					userFormData.Email
 				);
-				authState.value = AuthState.SuccesRegister;
+				authState = AuthState.SuccesRegister;
 			} else {
-				await authService.signIn(userFormData.Username, userFormData.Password);
+				await signIn(userFormData.Username, userFormData.Password);
 			}
 		} catch (error) {
 			switch (error) {
 				case AwsErrorCode.InvalidLogin:
-					authState.value = AuthState.LoginFailed;
+					authState = AuthState.LoginFailed;
 					break;
 				case AwsErrorCode.VerifyEmailRequired:
-					authState.value = AuthState.ValidateEmailRequired;
+					authState = AuthState.ValidateEmailRequired;
 					break;
 				case AwsErrorCode.PasswordRepeatNoMatch:
-					authState.value = AuthState.PasswordRepeatNoMatch;
+					authState = AuthState.PasswordRepeatNoMatch;
 					break;
 			}
 		}
@@ -109,7 +110,7 @@ function authenticate() {
 				</n-form-item>
 			</n-form>
 			<n-space>
-				<n-spin v-if="authService.loading.value" />
+				<n-spin v-if="loading" />
 				<n-button
 					v-else-if="register == 0"
 					type="primary"

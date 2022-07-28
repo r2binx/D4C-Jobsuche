@@ -1,10 +1,13 @@
-<script setup lang="ts">
-import SignIn from "./components/SignIn.vue";
-import Profile from "./components/Profile.vue";
-import { AwsAuthService } from "./lib/AwsAuthService";
+<script setup>
+let showUserModal = $ref(false);
+const toggleUserModal = () => (showUserModal = !showUserModal);
 
-const authService = inject("AwsAuthService") as AwsAuthService;
-const showUserModal = ref(false);
+let {
+	initialized: authInitialized,
+	loading: authLoading,
+	currentUser,
+	signOut,
+} = $(inject("AwsAuthService"));
 </script>
 
 <template>
@@ -12,24 +15,20 @@ const showUserModal = ref(false);
 		<router-link :to="'/'">
 			<n-h1>Jobsuche</n-h1>
 		</router-link>
-		<n-space
-			v-if="!!authService.currentUser.value"
-			align="center"
-			style="margin-top: -25px"
-		>
-			<n-spin v-if="authService.loading.value"></n-spin>
-			<n-button v-else secondary @click="authService.signOut">Logout</n-button>
+		<n-space v-if="!!currentUser" align="center" style="margin-top: -25px">
+			<n-spin v-if="authLoading"></n-spin>
+			<n-button v-else secondary @click="signOut">Logout</n-button>
 			<n-avatar
 				round
 				size="large"
 				src="https://img.icons8.com/ios-glyphs/344/user--v1.png"
-				@click="showUserModal = true"
 				style="cursor: pointer"
+				@click="toggleUserModal"
 			/>
 		</n-space>
 		<n-space v-else align="center" style="margin-top: -25px">
-			<n-spin v-if="authService.loading.value"></n-spin>
-			<n-button v-else secondary @click="showUserModal = true">Login</n-button>
+			<n-spin v-if="authLoading"></n-spin>
+			<n-button v-else secondary @click="toggleUserModal">Login</n-button>
 		</n-space>
 	</n-space>
 	<n-divider></n-divider>
@@ -42,15 +41,13 @@ const showUserModal = ref(false);
 			role="dialog"
 			aria-modal="true"
 		>
-			<n-spin v-if="!authService.initialized" />
-			<SignIn v-else-if="!authService.currentUser.value" />
+			<n-spin v-if="!authInitialized" />
+			<SignIn v-else-if="!currentUser" />
 			<Profile v-else />
 			<template #footer>
 				<n-divider />
 				<n-space justify="end">
-					<n-button secondary @click="showUserModal = false"
-						>Schließen</n-button
-					>
+					<n-button secondary @click="toggleUserModal">Schließen</n-button>
 				</n-space>
 			</template>
 		</n-card>

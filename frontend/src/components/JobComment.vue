@@ -1,22 +1,16 @@
-<script setup lang="ts">
-import { AwsAuthService } from "../lib/AwsAuthService";
-import { IJobComment } from "../lib/JobComment";
+<script setup>
 const props = defineProps({
-	Comment: {
-		type: Object as () => IJobComment,
+	userComment: {
+		type: Object,
 		required: true,
 	},
 });
 
-const authService = inject("AwsAuthService") as AwsAuthService;
-const isOwnComment = ref(
-	props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false
-);
+const { currentUser } = $(inject("AwsAuthService"));
 
-watch(authService.currentUser, () => {
-	isOwnComment.value =
-		props.Comment.UserSub == authService.currentUser.value?.Sub ? true : false;
-});
+let isOwnComment = $computed(() =>
+	props.userComment.UserSub == currentUser?.Sub ? true : false
+);
 </script>
 <template>
 	<div :class="'comment' + (isOwnComment ? ' ownComment' : '')" style="width: 100%">
@@ -26,11 +20,11 @@ watch(authService.currentUser, () => {
 				:type="isOwnComment ? 'success' : 'default'"
 				:class="'comment' + (isOwnComment ? ' ownComment' : '')"
 			>
-				{{ props.Comment.UserName + ", "
-				}}{{ new Date(props.Comment.Timestamp).toLocaleString() }}
+				{{ props.userComment.UserName + ", "
+				}}{{ new Date(props.userComment.Timestamp).toLocaleString() }}
 			</n-text>
 			<n-text>
-				{{ props.Comment.Text }}
+				{{ props.userComment.Text }}
 			</n-text>
 		</div>
 	</div>
