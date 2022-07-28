@@ -1,5 +1,6 @@
-<script setup lang="ts">import { AwsAuthService } from '../lib/AwsAuthService';
-import { IJobComment } from '../lib/JobComment';
+<script setup lang="ts">
+import { AwsAuthService } from "../lib/AwsAuthService";
+import { IJobComment } from "../lib/JobComment";
 
 const props = defineProps({
 	id: {
@@ -19,28 +20,32 @@ if (!jobDetailStore.getData(props.id)) {
 	});
 }
 
-
 const authService = inject("AwsAuthService") as AwsAuthService;
 const jobComments = ref<IJobComment[] | null>(null);
 const commentInput = ref<string | null>(null);
 const commentConntainerRef = ref();
 
 const connecting = ref(true);
-const ws = new WebSocket("wss://21h1ym9kpl.execute-api.us-east-1.amazonaws.com/production");
+const ws = new WebSocket(
+	"wss://21h1ym9kpl.execute-api.us-east-1.amazonaws.com/production"
+);
 ws.onopen = (event) => {
 	const message = {
 		action: "signUpPage",
-		Page: props.id
-	}
+		Page: props.id,
+	};
 	ws.send(JSON.stringify(message));
 };
 ws.onmessage = (event) => {
 	const data = JSON.parse((event as any).data);
 	if (data.action == "signUpPage") {
 		connecting.value = false;
-		jobComments.value = data.Comments.length > 0 ? data.Comments.sort((a, b) => {
-			return b.Timestamp - a.Timestamp;
-		}) : null;
+		jobComments.value =
+			data.Comments.length > 0
+				? data.Comments.sort((a, b) => {
+						return b.Timestamp - a.Timestamp;
+				  })
+				: null;
 	} else if (data.action == "commentJob") {
 		//sorry für den komischen code hier... aber Vue ignoriert einfach die Sortierung der Elemente im Array, auch beinem reactive array... so klappts jetzt auch wenns hässlich is :D
 		const comment = data.Comment as IJobComment;
@@ -53,17 +58,17 @@ ws.onmessage = (event) => {
 		jobComments.value = newComments;
 		commentConntainerRef.value?.scrollTo({
 			top: 0,
-			behavior: 'smooth'
-		})
+			behavior: "smooth",
+		});
 		if (comment.RangeKeyHash == pendingCommentRKH.value) {
 			pendingCommentRKH.value = null;
 			commentInput.value = null;
 		}
 	}
-}
+};
 ws.onerror = (event) => {
 	console.error(event);
-}
+};
 
 const pendingCommentRKH = ref<string | null>(null);
 
@@ -87,12 +92,11 @@ const sendComment = () => {
 	const message = {
 		action: "commentJob",
 		Authorization: authService.currentUser.value.IdToken,
-		Comment: comment
-	}
+		Comment: comment,
+	};
 	pendingCommentRKH.value = comment.RangeKeyHash;
 	ws.send(JSON.stringify(message));
 };
-
 
 onBeforeUnmount(() => {
 	ws.close(1000);
@@ -112,9 +116,10 @@ onBeforeUnmount(() => {
 						<n-h4>Beschreibung</n-h4>
 					</n-text>
 				</div>
-				<div style="margin-bottom: 2em;">
-					<pre
-						style="white-space: pre-wrap; font-family: unset;">{{ jobDetailStore.getData(props.id).stellenbeschreibung }}</pre>
+				<div style="margin-bottom: 2em">
+					<pre style="white-space: pre-wrap; font-family: unset">{{
+						jobDetailStore.getData(props.id).stellenbeschreibung
+					}}</pre>
 				</div>
 			</n-space>
 			<n-space vertical>
@@ -124,20 +129,36 @@ onBeforeUnmount(() => {
 					</n-text>
 				</div>
 				<div>
-					<a :href="jobDetailStore.getData(props.id).arbeitgeberdarstellungUrl" target="_blank">
+					<a
+						:href="jobDetailStore.getData(props.id).arbeitgeberdarstellungUrl"
+						target="_blank"
+					>
 						{{ jobDetailStore.getData(props.id).arbeitgeber }}
 					</a>
 					<div>
-						Land: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.land }}
+						Land:
+						{{
+							" " + jobDetailStore.getData(props.id).arbeitgeberAdresse.land
+						}}
 					</div>
 					<div>
-						Ort: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.ort }}
+						Ort:
+						{{
+							" " + jobDetailStore.getData(props.id).arbeitgeberAdresse.ort
+						}}
 					</div>
 					<div>
-						Plz: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.plz }}
+						Plz:
+						{{
+							" " + jobDetailStore.getData(props.id).arbeitgeberAdresse.plz
+						}}
 					</div>
 					<div>
-						Straße: {{ " " + jobDetailStore.getData(props.id).arbeitgeberAdresse.strasse }}
+						Straße:
+						{{
+							" " +
+							jobDetailStore.getData(props.id).arbeitgeberAdresse.strasse
+						}}
 					</div>
 				</div>
 			</n-space>
@@ -148,19 +169,32 @@ onBeforeUnmount(() => {
 	<n-space v-else vertical>
 		<div ref="commentConntainerRef" class="commentContainer">
 			<div v-if="!jobComments" class="noCommentsCard">Keine Kommentare</div>
-			<JobComment v-else v-for="comment in jobComments" :key="comment.Timestamp + comment.UserSub"
-				:Comment="comment">
+			<JobComment
+				v-else
+				v-for="comment in jobComments"
+				:key="comment.Timestamp + comment.UserSub"
+				:Comment="comment"
+			>
 			</JobComment>
 		</div>
 		<n-space justify="end">
-			<n-input v-model:value="commentInput" placeholder="Kommentar..." @keyup.enter="sendComment"
-				:disabled="!authService.currentUser.value" />
+			<n-input
+				v-model:value="commentInput"
+				placeholder="Kommentar..."
+				@keyup.enter="sendComment"
+				:disabled="!authService.currentUser.value"
+			/>
 			<n-spin v-if="pendingCommentRKH"></n-spin>
-			<n-button v-else @click="sendComment" :disabled="!authService.currentUser.value">Senden</n-button>
+			<n-button
+				v-else
+				@click="sendComment"
+				:disabled="!authService.currentUser.value"
+				>Senden</n-button
+			>
 		</n-space>
 		<n-space justify="end">
-			<n-text v-if="!authService.currentUser.value" italic>Melden Sie sich an um an der Unterhaltung
-				teilzunehmen.
+			<n-text v-if="!authService.currentUser.value" italic
+				>Melden Sie sich an um an der Unterhaltung teilzunehmen.
 			</n-text>
 		</n-space>
 	</n-space>
@@ -184,4 +218,3 @@ onBeforeUnmount(() => {
 	flex-direction: column-reverse;
 }
 </style>
-

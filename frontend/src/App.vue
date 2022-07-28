@@ -5,7 +5,6 @@ import { AwsAuthService } from "./lib/AwsAuthService";
 
 const authService = inject("AwsAuthService") as AwsAuthService;
 const showUserModal = ref(false);
-
 </script>
 
 <template>
@@ -13,13 +12,22 @@ const showUserModal = ref(false);
 		<router-link :to="'/'">
 			<n-h1>Jobsuche</n-h1>
 		</router-link>
-		<n-space v-if="!!authService.currentUser.value" align="center" style="margin-top: -25px;">
+		<n-space
+			v-if="!!authService.currentUser.value"
+			align="center"
+			style="margin-top: -25px"
+		>
 			<n-spin v-if="authService.loading.value"></n-spin>
 			<n-button v-else secondary @click="authService.signOut">Logout</n-button>
-			<n-avatar round size="large" src="https://img.icons8.com/ios-glyphs/344/user--v1.png"
-				@click="showUserModal = true" style="cursor: pointer" />
+			<n-avatar
+				round
+				size="large"
+				src="https://img.icons8.com/ios-glyphs/344/user--v1.png"
+				@click="showUserModal = true"
+				style="cursor: pointer"
+			/>
 		</n-space>
-		<n-space v-else align="center" style="margin-top: -25px;">
+		<n-space v-else align="center" style="margin-top: -25px">
 			<n-spin v-if="authService.loading.value"></n-spin>
 			<n-button v-else secondary @click="showUserModal = true">Login</n-button>
 		</n-space>
@@ -27,14 +35,22 @@ const showUserModal = ref(false);
 	<n-divider></n-divider>
 	<router-view />
 	<n-modal v-model:show="showUserModal">
-		<n-card style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
+		<n-card
+			style="width: 600px"
+			:bordered="false"
+			size="huge"
+			role="dialog"
+			aria-modal="true"
+		>
 			<n-spin v-if="!authService.initialized" />
 			<SignIn v-else-if="!authService.currentUser.value" />
 			<Profile v-else />
 			<template #footer>
 				<n-divider />
 				<n-space justify="end">
-					<n-button secondary @click="showUserModal = false">Schließen</n-button>
+					<n-button secondary @click="showUserModal = false"
+						>Schließen</n-button
+					>
 				</n-space>
 			</template>
 		</n-card>
