@@ -1,5 +1,5 @@
 {
-	"extends": "@vue/tsconfig/tsconfig.web.json",
+	"extends": "@vue/tsconfig/tsconfig.json",
 	"include": [
 		"auto-imports.d.ts",
 		"components.d.ts",
@@ -9,7 +9,10 @@
 		"src/**/*.vue"
 	],
 	"compilerOptions": {
-		"strict": false
-	},
-	"exclude": ["node_modules"]
+		"types": ["vite/client"],
+		"strict": false,
+		"allowJs": true,
+		"preserveValueImports": false,
+		"importsNotUsedAsValues": "remove"
+	}
 }

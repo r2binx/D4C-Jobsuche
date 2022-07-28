@@ -1,21 +1,16 @@
-<script setup lang="ts">
-import { AwsAuthService } from "../lib/AwsAuthService";
-import { IJobComment } from "../lib/JobComment";
+<script setup>
 const props = defineProps({
 	userComment: {
-		type: Object as () => IJobComment,
+		type: Object,
 		required: true,
 	},
 });
 
-const authService = inject("AwsAuthService") as AwsAuthService;
-const currentUser = $(authService.currentUser);
+const { currentUser } = $(inject("AwsAuthService"));
 
-let isOwnComment = $ref(props.userComment.UserSub == currentUser?.Sub ? true : false);
-
-watch(currentUser, () => {
-	isOwnComment = props.userComment.UserSub == currentUser?.Sub ? true : false;
-});
+let isOwnComment = $computed(() =>
+	props.userComment.UserSub == currentUser?.Sub ? true : false
+);
 </script>
 <template>
 	<div :class="'comment' + (isOwnComment ? ' ownComment' : '')" style="width: 100%">
