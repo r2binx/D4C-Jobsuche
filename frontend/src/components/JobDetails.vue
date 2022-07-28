@@ -156,7 +156,9 @@ onBeforeUnmount(() => {
 	<n-spin v-if="connecting"></n-spin>
 	<n-space v-else vertical>
 		<div ref="commentConntainerRef" class="commentContainer">
-			<div v-if="!jobComments" class="noCommentsCard">Keine Kommentare</div>
+			<div v-if="!jobComments || !jobComments.length" class="noCommentsCard">
+				Keine Kommentare
+			</div>
 			<!-- Iterate in reverse, slice() to not trigger reactivity loop when reverse() is called -->
 			<JobComment
 				v-else
