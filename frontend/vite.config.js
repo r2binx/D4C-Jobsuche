@@ -9,13 +9,6 @@ import Inspect from "vite-plugin-inspect";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	build: {
-		rollupOptions: {
-			input: {
-				main: resolve(__dirname, "index.html"),
-			},
-		},
-	},
 	plugins: [
 		vue({ reactivityTransform: true }),
 		Inspect(),
