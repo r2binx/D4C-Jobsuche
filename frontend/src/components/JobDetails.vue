@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IJobComment } from "../lib/JobComment";
+import { type IJobComment } from "../lib/JobComment";
 
 const props = defineProps({
 	id: {
@@ -19,7 +19,7 @@ if (!jobDetailStore.getData(props.id)) {
 	});
 }
 
-const { currentUser } = $(inject("AwsAuthService") as AwsAuthService);
+const { currentUser } = $(inject("AwsAuthService"));
 let jobComments = $ref<IJobComment[]>(null);
 let commentInput = $ref<string>(null);
 let commentConntainerRef = $ref();
@@ -37,26 +37,18 @@ ws.onmessage = (event) => {
 	const data = JSON.parse((event as any).data);
 	if (data.action == "signUpPage") {
 		connecting = false;
+		// sort array from old to new, simply push new
 		jobComments =
-			data.Comments.length > 0
+			data.Comments.length > 1
 				? data.Comments.sort((a, b) => {
-						return b.Timestamp - a.Timestamp;
+						return a.Timestamp - b.Timestamp;
 				  })
-				: null;
+				: data.Comments ?? [];
 	} else if (data.action == "commentJob") {
-		//sorry für den komischen code hier... aber Vue ignoriert einfach die Sortierung der Elemente im Array, auch beinem reactive array... so klappts jetzt auch wenns hässlich is :D
 		const comment = data.Comment as IJobComment;
-		const newComments = Array.from(jobComments || []);
-		newComments.push(comment);
-		newComments.sort((a, b) => {
-			return b.Timestamp - a.Timestamp;
-		});
-		jobComments = null;
-		jobComments = newComments;
-		commentConntainerRef?.scrollTo({
-			top: 0,
-			behavior: "smooth",
-		});
+
+		jobComments.push(comment);
+
 		if (comment.RangeKeyHash == pendingCommentRKH) {
 			pendingCommentRKH = null;
 			commentInput = null;
@@ -67,7 +59,7 @@ ws.onerror = (event) => {
 	console.error(event);
 };
 
-const pendingCommentRKH = $ref<string>(null);
+let pendingCommentRKH = $ref<string>(null);
 
 const sendComment = () => {
 	if (!commentInput) {
@@ -101,7 +93,6 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	{{ props.id }}
 	<n-card>
 		<n-spin v-if="loading" size="large" />
 		<n-space v-else style="text-align: left" vertical>
@@ -166,13 +157,12 @@ onBeforeUnmount(() => {
 	<n-space v-else vertical>
 		<div ref="commentConntainerRef" class="commentContainer">
 			<div v-if="!jobComments" class="noCommentsCard">Keine Kommentare</div>
+			<!-- Iterate in reverse, slice() to not trigger reactivity loop when reverse() is called -->
 			<JobComment
 				v-else
-				v-for="comment in jobComments"
-				:key="comment.Timestamp + comment.UserSub"
+				v-for="comment in jobComments.slice().reverse()"
 				:userComment="comment"
-			>
-			</JobComment>
+			/>
 		</div>
 		<n-space justify="end">
 			<n-input

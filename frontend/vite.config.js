@@ -13,23 +13,7 @@ export default defineConfig({
 		vue({ reactivityTransform: true }),
 		Inspect(),
 		AutoImport({
-			imports: [
-				"vue",
-				"vue-router",
-				"vue/macros",
-				{
-					"amazon-cognito-identity-js": [
-						"CognitoUserPool",
-						"CognitoUserAttribute",
-						"CognitoUser",
-						"AuthenticationDetails",
-						"CognitoUserSession",
-						"CognitoIdToken",
-						"CognitoRefreshToken",
-						"ISignUpResult",
-					],
-				},
-			],
+			imports: ["vue", "vue-router", "vue/macros"],
 			dirs: ["./src/composables", "./src/lib", "./src/store"],
 			dts: true,
 			resolvers: [NaiveUiResolver()],
