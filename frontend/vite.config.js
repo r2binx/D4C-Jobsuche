@@ -14,7 +14,7 @@ export default defineConfig({
 		Inspect(),
 		AutoImport({
 			imports: ["vue", "vue-router", "vue/macros"],
-			dirs: ["src/composables"],
+			dirs: ["./src/composables", "./src/lib", "./src/store"],
 			dts: true,
 			resolvers: [NaiveUiResolver()],
 			vueTemplate: true,
